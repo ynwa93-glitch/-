@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>별과 우주 (Stars & Universe) - 중2 과학 복습 퀴즈 게임</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Noto Sans KR) -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background: radial-gradient(circle at center, #1b2735 0%, #090a0f 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animated Space Stars Background */
+        .stars-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .star {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            animation: twinkle var(--duration) infinite ease-in-out;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        /* Glassmorphism Card Effect */
+        .glass-panel {
+            background: rgba(22, 30, 49, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .glass-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-btn:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px rgba(129, 140, 248, 0.5);
+        }
+
+        .glass-btn:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        /* Card Flip Style for Matching Game */
+        .card-perspective {
+            perspective: 1000px;
+        }
+
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+
+        .card-inner.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem;
+            text-align: center;
+        }
+
+        .card-back {
+            transform: rotateY(180deg);
+        }
+
+        /* Pulse Animations */
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 15px rgba(99, 102, 241, 0.4); }
+            50% { box-shadow: 0 0 30px rgba(139, 92, 246, 0.8); }
+        }
+
+        .pulse-glow {
+            animation: pulseGlow 2s infinite;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(99, 102, 241, 0.5);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(129, 140, 248, 0.8);
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen relative select-none">
+
+    <!-- Background Stars Effect -->
+    <div id="starsContainer" class="stars-container"></div>
+
+    <!-- Main Outer Wrapper -->
+    <div class="relative z-10 flex-1 flex flex-col max-w-4xl w-full mx-auto p-4 sm:p-6">
+        
+        <!-- Header / Navigation Bar -->
+        <header class="glass-panel rounded-2xl p-4 mb-6 flex justify-between items-center">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="goHome()">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white shadow-lg">
+                    <i class="fa-solid font-bold fa-user-astronaut text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg sm:text-xl font-black bg-clip-text text-transparent bg-gradient-to-r from-indigo-300 via-purple-300 to-pink-300">
+                        별과 우주 (Stars & Universe)
+                    </h1>
+                    <p class="text-xs text-indigo-200/70">중학교 2학년 과학 8단원 핵심 복습</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <!-- Sound Toggle Button -->
+                <button id="soundToggleBtn" onclick="toggleSound()" class="p-2.5 rounded-xl glass-btn text-indigo-200 hover:text-white" title="음향 온/오프">
+                    <i id="soundIcon" class="fa-solid fa-volume-high text-lg"></i>
+                </button>
+                <!-- Home Button -->
+                <button onclick="goHome()" class="p-2.5 rounded-xl glass-btn text-indigo-200 hover:text-white" title="메인으로">
+                    <i class="fa-solid fa-house text-lg"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Dynamic Game Screens Container -->
+        <main id="appContainer" class="flex-1 flex flex-col justify-center">
+            
+            <!-- SCREEN 1: HOME MENU -->
+            <div id="screenHome" class="glass-panel rounded-3xl p-6 sm:p-10 text-center animate-fade-in space-y-8">
+                <div class="space-y-3">
+                    <span class="inline-block px-3 py-1 text-xs font-semibold bg-indigo-500/20 text-indigo-300 rounded-full border border-indigo-500/30">
+                        🚀 과학 2학년 8단원 전범위 학습 게임
+                    </span>
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+                        별과 우주 탐험을 시작해볼까요?
+                    </h2>
+                    <p class="text-indigo-200/80 max-w-lg mx-auto text-sm sm:text-base leading-relaxed">
+                        별의 연주 시차, 밝기와 등급, 표면 온도부터 우리은하와 성운, 성단, 팽창하는 우주까지 즐겁게 복습해 보세요!
+                    </p>
+                </div>
+
+                <!-- Mode Selection Cards Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
+                    
+                    <!-- Mode 1 Card -->
+                    <div onclick="startQuizMode()" class="glass-btn rounded-2xl p-5 cursor-pointer flex flex-col justify-between hover:border-indigo-400 group">
+                        <div class="space-y-3">
+                            <div class="w-12 h-12 rounded-xl bg-indigo-500/20 text-indigo-300 flex items-center justify-center text-2xl group-hover:bg-indigo-500 group-hover:text-white transition-all">
+                                <i class="fa-solid fa-list-check"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-white">1. 우주 탐사 퀴즈</h3>
+                            <p class="text-xs text-indigo-200/70 leading-relaxed">
+                                8단원 핵심 개념 10문항! 상세한 정답 해설로 완전 학습.
+                            </p>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-white/10 flex justify-between items-center text-xs font-semibold text-indigo-300 group-hover:text-white">
+                            <span>도전하기</span>
+                            <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                        </div>
+                    </div>
+
+                    <!-- Mode 2 Card -->
+                    <div onclick="startMatchingMode()" class="glass-btn rounded-2xl p-5 cursor-pointer flex flex-col justify-between hover:border-purple-400 group">
+                        <div class="space-y-3">
+                            <div class="w-12 h-12 rounded-xl bg-purple-500/20 text-purple-300 flex items-center justify-center text-2xl group-hover:bg-purple-500 group-hover:text-white transition-all">
+                                <i class="fa-solid fa-clone"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-white">2. 별빛 카드 맞추기</h3>
+                            <p class="text-xs text-purple-200/70 leading-relaxed">
+                                개념과 정의 카드 쌍을 맞추는 카드 메모리 짝짓기 게임.
+                            </p>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-white/10 flex justify-between items-center text-xs font-semibold text-purple-300 group-hover:text-white">
+                            <span>도전하기</span>
+                            <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                        </div>
+                    </div>
+
+                    <!-- Mode 3 Card -->
+                    <div onclick="startSpeedMode()" class="glass-btn rounded-2xl p-5 cursor-pointer flex flex-col justify-between hover:border-pink-400 group">
+                        <div class="space-y-3">
+                            <div class="w-12 h-12 rounded-xl bg-pink-500/20 text-pink-300 flex items-center justify-center text-2xl group-hover:bg-pink-500 group-hover:text-white transition-all">
+                                <i class="fa-solid fa-bolt"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-white">3. 스피드 O/X 우주 레이스</h3>
+                            <p class="text-xs text-pink-200/70 leading-relaxed">
+                                제한 시간 내에 O/X 문제 정답을 빠르게 맞히는 우주 레이스!
+                            </p>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-white/10 flex justify-between items-center text-xs font-semibold text-pink-300 group-hover:text-white">
+                            <span>도전하기</span>
+                            <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Textbook Chapter Summary Badges -->
+                <div class="pt-4 border-t border-white/10 flex flex-wrap justify-center gap-2 text-xs text-indigo-300/80">
+                    <span class="px-2.5 py-1 rounded-md bg-white/5 border border-white/10">⭐ 연주 시차 & pc</span>
+                    <span class="px-2.5 py-1 rounded-md bg-white/5 border border-white/10">⭐ 겉보기·절대 등급</span>
+                    <span class="px-2.5 py-1 rounded-md bg-white/5 border border-white/10">⭐ 별의 색과 온도</span>
+                    <span class="px-2.5 py-1 rounded-md bg-white/5 border border-white/10">⭐ 우리은하 구조</span>
+                    <span class="px-2.5 py-1 rounded-md bg-white/5 border border-white/10">⭐ 성운과 성단</span>
+                    <span class="px-2.5 py-1 rounded-md bg-white/5 border border-white/10">⭐ 우주 팽창 & 탐사</span>
+                </div>
+            </div>
+
+
+            <!-- SCREEN 2: MODE 1 - MULTIPLE CHOICE QUIZ -->
+            <div id="screenQuiz" class="hidden glass-panel rounded-3xl p-6 sm:p-8 space-y-6">
+                <!-- Quiz Progress Info Bar -->
+                <div class="flex justify-between items-center">
+                    <span id="quizProgressText" class="text-xs sm:text-sm font-bold text-indigo-300 bg-indigo-500/20 px-3 py-1.5 rounded-xl border border-indigo-500/30">
+                        문제 1 / 10
+                    </span>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-indigo-200/70">현재 점수:</span>
+                        <span id="quizScoreText" class="text-base sm:text-lg font-black text-amber-400">0점</span>
+                    </div>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="w-full bg-white/10 h-2 rounded-full overflow-hidden">
+                    <div id="quizProgressBar" class="bg-gradient-to-r from-indigo-500 to-purple-500 h-full w-0 transition-all duration-300"></div>
+                </div>
+
+                <!-- Question Box -->
+                <div class="space-y-4">
+                    <div class="inline-block px-2.5 py-1 text-xs font-semibold text-purple-300 bg-purple-500/20 rounded-lg" id="quizCategoryBadge">
+                        단원 카테고리
+                    </div>
+                    <h3 id="quizQuestionText" class="text-lg sm:text-xl font-bold text-white leading-snug min-h-[56px]">
+                        질문 텍스트가 여기에 표시됩니다.
+                    </h3>
+                </div>
+
+                <!-- Options Grid -->
+                <div id="quizOptionsContainer" class="grid grid-cols-1 gap-3">
+                    <!-- Option buttons dynamically generated -->
+                </div>
+
+                <!-- Explanation Box (Hidden by default, shows after answer) -->
+                <div id="quizExplanationBox" class="hidden rounded-2xl bg-indigo-950/80 border border-indigo-500/40 p-4 space-y-2 animate-fade-in">
+                    <div class="flex items-center gap-2 font-bold text-indigo-300 text-sm">
+                        <i id="quizFeedbackIcon" class="fa-solid fa-circle-info"></i>
+                        <span id="quizFeedbackTitle">해설</span>
+                    </div>
+                    <p id="quizExplanationText" class="text-xs sm:text-sm text-indigo-100/90 leading-relaxed">
+                        해설 내용이 여기에 들어갑니다.
+                    </p>
+                    <button id="quizNextBtn" onclick="nextQuizQuestion()" class="w-full mt-3 py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 font-bold text-white hover:from-indigo-600 hover:to-purple-700 transition-all shadow-lg text-sm">
+                        다음 문제로 <i class="fa-solid fa-arrow-right ml-1"></i>
+                    </button>
+                </div>
+            </div>
+
+
+            <!-- SCREEN 3: MODE 2 - CARD MATCHING GAME -->
+            <div id="screenMatching" class="hidden glass-panel rounded-3xl p-6 sm:p-8 space-y-6">
+                <!-- Top Status Bar -->
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h3 class="text-lg font-bold text-white">별빛 카드 맞추기</h3>
+                        <p class="text-xs text-purple-200/70">관련 있는 [개념]과 [설명] 카드를 서로 짝지어 보세요!</p>
+                    </div>
+                    <div class="flex items-center gap-4 text-sm font-semibold">
+                        <div>시도: <span id="matchMovesText" class="text-purple-300 font-bold">0</span></div>
+                        <div>매칭: <span id="matchMatchesText" class="text-pink-400 font-bold">0 / 6</span></div>
+                    </div>
+                </div>
+
+                <!-- Card Grid (12 Cards - 6 Pairs) -->
+                <div id="cardGrid" class="grid grid-cols-3 sm:grid-cols-4 gap-3 sm:gap-4">
+                    <!-- Cards will be dynamically inserted here -->
+                </div>
+            </div>
+
+
+            <!-- SCREEN 4: MODE 3 - SPEED O/X RACE -->
+            <div id="screenSpeed" class="hidden glass-panel rounded-3xl p-6 sm:p-8 space-y-6">
+                <!-- Header with Timer Bar -->
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center">
+                        <span id="speedProgressText" class="text-xs font-bold text-pink-300 bg-pink-500/20 px-3 py-1 rounded-xl border border-pink-500/30">
+                            ROUND 1
+                        </span>
+                        <div class="flex items-center gap-3">
+                            <span class="text-xs text-pink-200/70">점수: <strong id="speedScoreText" class="text-pink-400 text-base">0</strong></span>
+                            <span class="text-xs text-amber-200/70"><i class="fa-solid fa-clock text-amber-400 mr-1"></i><strong id="speedTimerText" class="text-amber-400 text-base">10</strong>초</span>
+                        </div>
+                    </div>
+                    <!-- Countdown Bar -->
+                    <div class="w-full bg-white/10 h-2 rounded-full overflow-hidden">
+                        <div id="speedTimerBar" class="bg-amber-400 h-full w-full transition-all duration-100"></div>
+                    </div>
+                </div>
+
+                <!-- Speed Statement Box -->
+                <div class="py-6 px-4 rounded-2xl bg-white/5 border border-white/10 text-center min-h-[140px] flex items-center justify-center">
+                    <h3 id="speedQuestionText" class="text-lg sm:text-xl font-bold text-white leading-relaxed">
+                        질문 문장이 표시됩니다.
+                    </h3>
+                </div>
+
+                <!-- O / X Buttons -->
+                <div class="grid grid-cols-2 gap-4">
+                    <button onclick="submitSpeedAnswer(true)" class="py-6 rounded-2xl bg-emerald-500/20 border-2 border-emerald-500/50 hover:bg-emerald-500/40 text-emerald-300 text-3xl font-black transition-all flex flex-col items-center gap-1 active:scale-95">
+                        <i class="fa-solid fa-o"></i>
+                        <span class="text-xs font-bold">그렇다 (O)</span>
+                    </button>
+                    <button onclick="submitSpeedAnswer(false)" class="py-6 rounded-2xl bg-rose-500/20 border-2 border-rose-500/50 hover:bg-rose-500/40 text-rose-300 text-3xl font-black transition-all flex flex-col items-center gap-1 active:scale-95">
+                        <i class="fa-solid fa-xmark"></i>
+                        <span class="text-xs font-bold">아니다 (X)</span>
+                    </button>
+                </div>
+
+                <!-- Quick Feedback Banner -->
+                <div id="speedFeedbackBanner" class="hidden text-center py-2 text-sm font-bold rounded-xl animate-fade-in">
+                    <!-- Feedback message -->
+                </div>
+            </div>
+
+
+            <!-- SCREEN 5: GAME OVER / RESULT SCOREBOARD -->
+            <div id="screenResult" class="hidden glass-panel rounded-3xl p-6 sm:p-10 text-center space-y-6">
+                <div class="w-20 h-20 mx-auto rounded-full bg-gradient-to-tr from-amber-400 to-yellow-300 text-slate-900 flex items-center justify-center text-4xl shadow-lg pulse-glow">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+
+                <div class="space-y-2">
+                    <h2 class="text-2xl sm:text-3xl font-black text-white" id="resultTitle">
+                        탐사 미션 완료!
+                    </h2>
+                    <p class="text-xs sm:text-sm text-indigo-200/80" id="resultSubtitle">
+                        우주 과학 개념을 훌륭하게 복습하셨습니다.
+                    </p>
+                </div>
+
+                <!-- Star Rating Display -->
+                <div id="resultStars" class="flex justify-center gap-2 text-3xl text-amber-400">
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                </div>
+
+                <!-- Final Score Card -->
+                <div class="glass-panel rounded-2xl p-5 max-w-sm mx-auto space-y-3 border border-white/10">
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="text-indigo-200/70">도전 모드</span>
+                        <span id="resultModeName" class="font-bold text-indigo-300">우주 탐사 퀴즈</span>
+                    </div>
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="text-indigo-200/70">최종 점수</span>
+                        <span id="resultFinalScore" class="text-2xl font-black text-amber-400">100점</span>
+                    </div>
+                    <div id="resultExtraDetail" class="text-xs text-indigo-200/60 pt-2 border-t border-white/10 text-right">
+                        정답률 100% (10/10)
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row justify-center gap-3 pt-4">
+                    <button onclick="retryCurrentMode()" class="px-6 py-3.5 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 font-bold text-white hover:from-indigo-600 hover:to-purple-700 transition-all shadow-lg text-sm">
+                        <i class="fa-solid fa-rotate-right mr-2"></i> 다시 도전하기
+                    </button>
+                    <button onclick="goHome()" class="px-6 py-3.5 rounded-xl glass-btn font-bold text-indigo-200 hover:text-white text-sm">
+                        <i class="fa-solid fa-house mr-2"></i> 메인 메뉴로
+                    </button>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- Footer Notice -->
+        <footer class="mt-6 text-center text-xs text-indigo-200/40">
+            [비상교육 중학교 과학 2] VIII. 별과 우주 단원 연계 학습용 퀴즈
+        </footer>
+    </div>
+
+    <!-- AUDIO SYNTHESIZER (Web Audio API) & GAME SCRIPT -->
+    <script>
+        /* ==========================================================================
+           1. WEB AUDIO API SYNTHESIZER (No external audio files needed)
+           ========================================================================== */
+        let audioCtx = null;
+        let isSoundEnabled = true;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function toggleSound() {
+            isSoundEnabled = !isSoundEnabled;
+            const icon = document.getElementById('soundIcon');
+            if (isSoundEnabled) {
+                icon.className = "fa-solid fa-volume-high text-lg";
+            } else {
+                icon.className = "fa-solid fa-volume-xmark text-lg text-rose-400";
+            }
+        }
+
+        function playSound(type) {
+            if (!isSoundEnabled) return;
+            initAudio();
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (type === 'correct') {
+                // Happy chord
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(523.25, now); // C5
+                osc.frequency.setValueAtTime(659.25, now + 0.1); // E5
+                osc.frequency.setValueAtTime(783.99, now + 0.2); // G5
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+                osc.start(now);
+                osc.stop(now + 0.5);
+            } else if (type === 'wrong') {
+                // Low buzz
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(180, now);
+                osc.frequency.setValueAtTime(130, now + 0.15);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+                osc.start(now);
+                osc.stop(now + 0.4);
+            } else if (type === 'flip') {
+                // Click
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(400, now);
+                osc.frequency.exponentialRampToValueAtTime(800, now + 0.05);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+                osc.start(now);
+                osc.stop(now + 0.05);
+            } else if (type === 'win') {
+                // Victory Fanfare
+                const notes = [523.25, 659.25, 783.99, 1046.50];
+                notes.forEach((freq, idx) => {
+                    const noteOsc = audioCtx.createOscillator();
+                    const noteGain = audioCtx.createGain();
+                    noteOsc.connect(noteGain);
+                    noteGain.connect(audioCtx.destination);
+                    noteOsc.type = 'triangle';
+                    noteOsc.frequency.setValueAtTime(freq, now + idx * 0.12);
+                    noteGain.gain.setValueAtTime(0.25, now + idx * 0.12);
+                    noteGain.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.12 + 0.3);
+                    noteOsc.start(now + idx * 0.12);
+                    noteOsc.stop(now + idx * 0.12 + 0.3);
+                });
+            }
+        }
+
+
+        /* ==========================================================================
+           2. BACKGROUND STARS GENERATOR
+           ========================================================================== */
+        function createStars() {
+            const container = document.getElementById('starsContainer');
+            const starCount = 60;
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                const size = Math.random() * 3 + 1;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.top = `${Math.random() * 100}%`;
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.setProperty('--duration', `${Math.random() * 3 + 2}s`);
+                star.style.animationDelay = `${Math.random() * 3}s`;
+                container.appendChild(star);
+            }
+        }
+        createStars();
+
+
+        /* ==========================================================================
+           3. DATA BANK (Questions, Cards, OX Bank)
+           ========================================================================== */
+        // Chapter 8-1 & 8-2 Multiple Choice Quiz Data (10 Questions)
+        const quizQuestionsData = [
+            {
+                category: "8-1. 별 - 연주 시차",
+                question: "지구에서 관측한 어떤 별의 연주 시차가 0.1\"(초)였습니다. 지구에서 이 별까지의 거리는 얼마일까요?",
+                options: ["1 pc", "5 pc", "10 pc", "100 pc"],
+                answer: 2,
+                explanation: "별까지의 거리(pc) = 1 / 연주 시차(\") 관계가 성립합니다. 따라서 1 / 0.1\" = 10 pc 이 됩니다."
+            },
+            {
+                category: "8-1. 별 - 연주 시차와 거리",
+                question: "별의 연주 시차 현상이 나타나는 근본적인 원인은 무엇일까요?",
+                options: [
+                    "지구가 태양 주위를 공전하기 때문",
+                    "지구가 자전축을 중심으로 자전하기 때문",
+                    "별들이 실제로 우주 공간에서 빠르게 이동하기 때문",
+                    "지구 대기에 의해 빛이 꺾이기 때문"
+                ],
+                answer: 0,
+                explanation: "지구가 태양 주위를 공전함에 따라 관측 지점이 달라지므로 정지해 있는 가까운 별의 위치가 배경 별에 대해 다르게 보이는 연주 시차가 나타납니다."
+            },
+            {
+                category: "8-1. 별 - 별의 등급과 밝기",
+                question: "1등급인 별은 6등급인 별보다 약 몇 배 더 밝을까요?",
+                options: ["5배", "2.5배", "50배", "100배"],
+                answer: 3,
+                explanation: "별의 등급은 1등급 차이마다 약 2.5배의 밝기 차이가 납니다. 5등급 차이가 나면 (2.5)^5 ≈ 약 100배 더 밝습니다."
+            },
+            {
+                category: "8-1. 별 - 겉보기 등급과 절대 등급",
+                question: "어떤 별의 겉보기 등급이 1.1등급이고 절대 등급이 -6.0등급입니다. 이 별까지의 거리는 얼마일까요?",
+                options: [
+                    "10 pc에 위치한다.",
+                    "10 pc보다 가까운 거리에 있다.",
+                    "10 pc보다 먼 거리에 있다.",
+                    "거리를 추론할 수 없다."
+                ],
+                answer: 2,
+                explanation: "겉보기 등급이 절대 등급보다 크면(겉보기 > 절대), 실제 밝기(10pc에 두었을 때)보다 우리 눈에 더 어둡게 보이는 것이므로 10 pc보다 멀리 위치한 별입니다."
+            },
+            {
+                category: "8-1. 별 - 표면 온도와 색",
+                question: "다음 별들 중 표면 온도가 가장 높은 별의 색깔은 무엇일까요?",
+                options: ["적색 (Red)", "황색 (Yellow)", "주황색 (Orange)", "청색 (Blue)"],
+                answer: 3,
+                explanation: "별은 표면 온도가 높을수록 청색(청백색)을 띠고, 표면 온도가 낮을수록 적색(주황색)을 띱니다. 참고로 태양은 황색 별입니다."
+            },
+            {
+                category: "8-2. 우리은하 - 우리은하의 구조",
+                question: "우리은하의 모습과 태양계의 위치에 대한 설명으로 옳은 것은?",
+                options: [
+                    "위에서 보면 완벽한 구형 모양이다.",
+                    "태양계는 우리은하의 정확한 중심부에 위치한다.",
+                    "우리은하 지름은 약 30,000 pc이며, 태양계는 중심에서 약 8,500 pc 떨어진 나선팔에 있다.",
+                    "은하수는 우리은하 전체가 한눈에 다 보이는 것이다."
+                ],
+                answer: 2,
+                explanation: "우리은하는 위에서 보면 막대 나선 은하, 옆에서 보면 중심부가 부풀어 오른 원반 모양입니다. 지름은 약 30,000 pc이며 태양계는 중심에서 약 8,500 pc 떨어진 나선팔에 있습니다."
+            },
+            {
+                category: "8-2. 우리은하 - 성운과 성단",
+                question: "수만 개~수십만 개의 늙은 별들이 공 모양으로 빽빽하게 모여 있는 성단의 종류는?",
+                options: ["산개 성단", "구상 성단", "방출 성운", "암흑 성운"],
+                answer: 1,
+                explanation: "구상 성단은 늙은 별들이 공 모양으로 빽빽하게 모여 있는 성단이며, 주로 은하 중심부나 헤일로(외곽)에 분포합니다. 수십~수만 개의 젊은 별이 엉성하게 모인 것은 산개 성단입니다."
+            },
+            {
+                category: "8-2. 우리은하 - 성운의 종류",
+                question: "뒤쪽에서 오는 별빛을 가로막아 밤하늘에서 어둡게 구름처럼 보이는 성운은?",
+                options: ["방출 성운", "반사 성운", "암흑 성운", "행성상 성운"],
+                answer: 2,
+                explanation: "암흑 성운(예: 말머리성운)은 성간 물질이 뒤쪽에서 오는 별빛을 가로막아 어둡게 보이는 성운입니다."
+            },
+            {
+                category: "8-2. 우주 탐사 - 팽창하는 우주",
+                question: "풍선 표면에 붙임딱지를 붙이고 풍선을 불어 부풀리는 탐구 실험에서 알 수 있는 우주 팽창의 특징은?",
+                options: [
+                    "우리은하가 우주의 중심에서 팽창을 주도한다.",
+                    "모든 은하들이 중심 없이 서로 멀어지며, 멀리 있는 은하일수록 더 빠르게 멀어진다.",
+                    "가까이 있는 은하끼리는 서로 끌어당겨 가까워진다.",
+                    "우주는 과거로 갈수록 더 넓어진다."
+                ],
+                answer: 1,
+                explanation: "우주는 특정한 중심이 없으며, 모든 방향으로 계속 팽창하기 때문에 모든 은하가 서로 멀어집니다."
+            },
+            {
+                category: "8-2. 우주 탐사 - 스핀오프 기술",
+                question: "다음 중 우주 탐사 기술을 개발하는 과정에서 파생되어 우리 일상생활에 활용된 예가 아닌 것은?",
+                options: [
+                    "정수기 필터 기술",
+                    "위성 위치 확인 시스템 (GPS)",
+                    "형상 기억 합금을 이용한 안경테",
+                    "석탄 화력 발전소의 연돌"
+                ],
+                answer: 3,
+                explanation: "정수기, GPS, 에어쿠션 운동화, 형상 기억 합금 안경테, 체온 유지 기능성 의류 등은 우주 탐사 기술에서 일상생활로 적용된 대표적 스핀오프 사례입니다."
+            }
+        ];
+
+        // Matching Game Cards Data (6 Pairs = 12 Cards)
+        const matchingPairsData = [
+            { term: "연주 시차 1\"", def: "거리 1 pc (약 3.26광년)" },
+            { term: "10 pc 거리", def: "겉보기 등급 = 절대 등급" },
+            { term: "5등급 차이", def: "밝기 약 100배 차이" },
+            { term: "청색 별", def: "표면 온도가 매우 높음" },
+            { term: "구상 성단", def: "공 모양으로 빽빽한 별 무리" },
+            { term: "암흑 성운", def: "뒤쪽 별빛을 가려 어둡게 보임" }
+        ];
+
+        // Speed O/X Questions Bank
+        const speedOxBank = [
+            { text: "별까지의 거리가 가까울수록 연주 시차는 더 크게 나타난다.", ans: true },
+            { text: "겉보기 등급은 별의 실제 밝기를 비교할 수 있는 등급이다.", ans: false }, // 절대등급이 실제밝기
+            { text: "별의 등급 숫자가 작을수록 더 밝은 별이다.", ans: true },
+            { text: "태양의 표면 온도는 청색 별보다 더 높다.", ans: false }, // 태양은 황색
+            { text: "우리은하를 옆에서 보면 중심부가 약간 부풀어 있는 원반 모양이다.", ans: true },
+            { text: "산개 성단은 주로 젊은 파란색 별들이 엉성하게 모여 있다.", ans: true },
+            { text: "우리은하가 우주의 정확한 중심이다.", ans: false }, // 중심 없음
+            { text: "방출 성운은 성간 물질이 주변 별빛을 흡수하여 가열되어 스스로 빛을 낸다.", ans: true },
+            { text: "별의 밝기는 거리가 2배 멀어지면 1/2로 줄어든다.", ans: false }, // 거리 제곱에 반비례 (1/4)
+            { text: "우주 망원경은 지구 대기의 방해를 받지 않고 천체를 관측할 수 있다.", ans: true }
+        ];
+
+
+        /* ==========================================================================
+           4. GAME STATE & NAVIGATION LOGIC
+           ========================================================================== */
+        let currentMode = 'home'; // 'quiz', 'matching', 'speed'
+
+        function hideAllScreens() {
+            document.getElementById('screenHome').classList.add('hidden');
+            document.getElementById('screenQuiz').classList.add('hidden');
+            document.getElementById('screenMatching').classList.add('hidden');
+            document.getElementById('screenSpeed').classList.add('hidden');
+            document.getElementById('screenResult').classList.add('hidden');
+        }
+
+        function goHome() {
+            hideAllScreens();
+            currentMode = 'home';
+            document.getElementById('screenHome').classList.remove('hidden');
+            stopSpeedTimer();
+        }
+
+        function showResultScreen(modeName, score, detailText, starsCount) {
+            hideAllScreens();
+            document.getElementById('screenResult').classList.remove('hidden');
+            playSound('win');
+
+            document.getElementById('resultModeName').innerText = modeName;
+            document.getElementById('resultFinalScore').innerText = `${score}점`;
+            document.getElementById('resultExtraDetail').innerText = detailText;
+
+            // Generate Stars HTML
+            const starsContainer = document.getElementById('resultStars');
+            starsContainer.innerHTML = '';
+            for (let i = 0; i < 3; i++) {
+                if (i < starsCount) {
+                    starsContainer.innerHTML += `<i class="fa-solid fa-star animate-bounce" style="animation-delay:${i*0.15}s"></i>`;
+                } else {
+                    starsContainer.innerHTML += `<i class="fa-regular fa-star text-slate-600"></i>`;
+                }
+            }
+        }
+
+        function retryCurrentMode() {
+            if (currentMode === 'quiz') startQuizMode();
+            else if (currentMode === 'matching') startMatchingMode();
+            else if (currentMode === 'speed') startSpeedMode();
+            else goHome();
+        }
+
+
+        /* ==========================================================================
+           5. MODE 1: QUIZ GAME LOGIC
+           ========================================================================== */
+        let quizIndex = 0;
+        let quizScore = 0;
+
+        function startQuizMode() {
+            hideAllScreens();
+            currentMode = 'quiz';
+            quizIndex = 0;
+            quizScore = 0;
+            document.getElementById('screenQuiz').classList.remove('hidden');
+            renderQuizQuestion();
+        }
+
+        function renderQuizQuestion() {
+            const q = quizQuestionsData[quizIndex];
+            document.getElementById('quizProgressText').innerText = `문제 ${quizIndex + 1} / ${quizQuestionsData.length}`;
+            document.getElementById('quizScoreText').innerText = `${quizScore}점`;
+            
+            // Progress Bar Width
+            const progressPct = ((quizIndex) / quizQuestionsData.length) * 100;
+            document.getElementById('quizProgressBar').style.width = `${progressPct}%`;
+
+            document.getElementById('quizCategoryBadge').innerText = q.category;
+            document.getElementById('quizQuestionText').innerText = q.question;
+
+            // Hide Explanation Box
+            document.getElementById('quizExplanationBox').classList.add('hidden');
+
+            // Render Option Buttons
+            const optionsContainer = document.getElementById('quizOptionsContainer');
+            optionsContainer.innerHTML = '';
+            q.options.forEach((optText, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-4 rounded-xl glass-btn hover:border-indigo-400 text-sm sm:text-base font-semibold text-indigo-100 flex items-center justify-between transition-all";
+                btn.innerHTML = `
+                    <span>${idx + 1}. ${optText}</span>
+                    <i class="fa-regular fa-circle text-indigo-300/40 text-lg"></i>
+                `;
+                btn.onclick = () => checkQuizAnswer(idx, btn);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkQuizAnswer(selectedIndex, selectedBtn) {
+            const q = quizQuestionsData[quizIndex];
+            const optionsContainer = document.getElementById('quizOptionsContainer');
+            const buttons = optionsContainer.querySelectorAll('button');
+
+            // Disable all option buttons
+            buttons.forEach(b => b.disabled = true);
+
+            const isCorrect = (selectedIndex === q.answer);
+            const expBox = document.getElementById('quizExplanationBox');
+            const expTitle = document.getElementById('quizFeedbackTitle');
+            const expIcon = document.getElementById('quizFeedbackIcon');
+            const expText = document.getElementById('quizExplanationText');
+
+            if (isCorrect) {
+                playSound('correct');
+                quizScore += 10;
+                document.getElementById('quizScoreText').innerText = `${quizScore}점`;
+                selectedBtn.className = "w-full text-left p-4 rounded-xl bg-emerald-500/30 border-2 border-emerald-400 text-sm sm:text-base font-bold text-emerald-200 flex items-center justify-between";
+                selectedBtn.querySelector('i').className = "fa-solid fa-circle-check text-emerald-400 text-xl";
+
+                expTitle.innerText = "정답입니다!";
+                expTitle.className = "text-emerald-300 font-bold";
+                expIcon.className = "fa-solid fa-circle-check text-emerald-400 text-lg";
+            } else {
+                playSound('wrong');
+                selectedBtn.className = "w-full text-left p-4 rounded-xl bg-rose-500/30 border-2 border-rose-400 text-sm sm:text-base font-bold text-rose-200 flex items-center justify-between";
+                selectedBtn.querySelector('i').className = "fa-solid fa-circle-xmark text-rose-400 text-xl";
+
+                // Highlight Correct Option
+                const correctBtn = buttons[q.answer];
+                correctBtn.className = "w-full text-left p-4 rounded-xl bg-emerald-500/20 border-2 border-emerald-500/60 text-sm sm:text-base font-bold text-emerald-200 flex items-center justify-between";
+                correctBtn.querySelector('i').className = "fa-solid fa-circle-check text-emerald-400 text-xl";
+
+                expTitle.innerText = "오답입니다.";
+                expTitle.className = "text-rose-300 font-bold";
+                expIcon.className = "fa-solid fa-circle-xmark text-rose-400 text-lg";
+            }
+
+            expText.innerText = q.explanation;
+            expBox.classList.remove('hidden');
+        }
+
+        function nextQuizQuestion() {
+            quizIndex++;
+            if (quizIndex < quizQuestionsData.length) {
+                renderQuizQuestion();
+            } else {
+                // Quiz Finish
+                const stars = quizScore >= 90 ? 3 : (quizScore >= 60 ? 2 : 1);
+                showResultScreen("우주 탐사 퀴즈", quizScore, `10문항 중 ${quizScore / 10}문제 정답!`, stars);
+            }
+        }
+
+
+        /* ==========================================================================
+           6. MODE 2: CARD MATCHING GAME LOGIC
+           ========================================================================== */
+        let matchCardsData = [];
+        let flippedCards = [];
+        let matchedCount = 0;
+        let matchMoves = 0;
+
+        function startMatchingMode() {
+            hideAllScreens();
+            currentMode = 'matching';
+            document.getElementById('screenMatching').classList.remove('hidden');
+
+            matchedCount = 0;
+            matchMoves = 0;
+            flippedCards = [];
+            document.getElementById('matchMovesText').innerText = '0';
+            document.getElementById('matchMatchesText').innerText = `0 / ${matchingPairsData.length}`;
+
+            // Prepare Cards List
+            let cardsArr = [];
+            matchingPairsData.forEach((pair, pairIdx) => {
+                cardsArr.push({ id: `p${pairIdx}_term`, pairId: pairIdx, text: pair.term, type: '개념' });
+                cardsArr.push({ id: `p${pairIdx}_def`, pairId: pairIdx, text: pair.def, type: '설명' });
+            });
+
+            // Shuffle Cards
+            cardsArr.sort(() => Math.random() - 0.5);
+            matchCardsData = cardsArr;
+
+            // Render Grid
+            const grid = document.getElementById('cardGrid');
+            grid.innerHTML = '';
+            matchCardsData.forEach((cardObj, idx) => {
+                const cardEl = document.createElement('div');
+                cardEl.className = "h-28 sm:h-32 card-perspective cursor-pointer";
+                cardEl.innerHTML = `
+                    <div class="card-inner" id="cardInner_${idx}">
+                        <!-- Front Face (Hidden state) -->
+                        <div class="card-front glass-panel hover:border-purple-400/80 border border-white/10 flex flex-col items-center justify-center gap-1">
+                            <i class="fa-solid fa-star text-purple-400/60 text-xl sm:text-2xl"></i>
+                            <span class="text-[10px] text-purple-200/50">별빛 카드</span>
+                        </div>
+                        <!-- Back Face (Revealed content) -->
+                        <div class="card-back bg-gradient-to-br ${cardObj.type === '개념' ? 'from-indigo-600 to-purple-800 border-indigo-400' : 'from-purple-700 to-pink-900 border-pink-400'} border-2 shadow-xl flex flex-col justify-between p-2">
+                            <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-black/40 text-white/80 self-start">${cardObj.type}</span>
+                            <span class="text-xs sm:text-sm font-bold text-white my-auto leading-tight">${cardObj.text}</span>
+                        </div>
+                    </div>
+                `;
+                cardEl.onclick = () => onCardClick(idx);
+                grid.appendChild(cardEl);
+            });
+        }
+
+        function onCardClick(index) {
+            const cardInner = document.getElementById(`cardInner_${index}`);
+            
+            // Ignore if already flipped or matched
+            if (cardInner.classList.contains('flipped') || flippedCards.length >= 2) return;
+
+            playSound('flip');
+            cardInner.classList.add('flipped');
+            flippedCards.push({ index, pairId: matchCardsData[index].pairId });
+
+            if (flippedCards.length === 2) {
+                matchMoves++;
+                document.getElementById('matchMovesText').innerText = matchMoves;
+
+                const [c1, c2] = flippedCards;
+                if (c1.pairId === c2.pairId && c1.index !== c2.index) {
+                    // Match Success
+                    playSound('correct');
+                    matchedCount++;
+                    document.getElementById('matchMatchesText').innerText = `${matchedCount} / ${matchingPairsData.length}`;
+                    flippedCards = [];
+
+                    if (matchedCount === matchingPairsData.length) {
+                        setTimeout(() => {
+                            const score = Math.max(100 - (matchMoves - matchingPairsData.length) * 5, 50);
+                            const stars = matchMoves <= 8 ? 3 : (matchMoves <= 12 ? 2 : 1);
+                            showResultScreen("별빛 카드 맞추기", score, `${matchMoves}회 시도만에 완료!`, stars);
+                        }, 800);
+                    }
+                } else {
+                    // Match Failed - Flip back after delay
+                    playSound('wrong');
+                    setTimeout(() => {
+                        document.getElementById(`cardInner_${c1.index}`).classList.remove('flipped');
+                        document.getElementById(`cardInner_${c2.index}`).classList.remove('flipped');
+                        flippedCards = [];
+                    }, 1000);
+                }
+            }
+        }
+
+
+        /* ==========================================================================
+           7. MODE 3: SPEED O/X RACE LOGIC
+           ========================================================================== */
+        let speedIndex = 0;
+        let speedScore = 0;
+        let speedTimer = null;
+        let speedTimeLeft = 10;
+        let currentSpeedQuestions = [];
+
+        function startSpeedMode() {
+            hideAllScreens();
+            currentMode = 'speed';
+            document.getElementById('screenSpeed').classList.remove('hidden');
+
+            speedIndex = 0;
+            speedScore = 0;
+
+            // Shuffle OX Questions Bank
+            currentSpeedQuestions = [...speedOxBank].sort(() => Math.random() - 0.5);
+
+            renderSpeedQuestion();
+        }
+
+        function renderSpeedQuestion() {
+            if (speedIndex >= currentSpeedQuestions.length) {
+                stopSpeedTimer();
+                const stars = speedScore >= 80 ? 3 : (speedScore >= 50 ? 2 : 1);
+                showResultScreen("스피드 O/X 우주 레이스", speedScore, `총 ${currentSpeedQuestions.length}라운드 완료!`, stars);
+                return;
+            }
+
+            const q = currentSpeedQuestions[speedIndex];
+            document.getElementById('speedProgressText').innerText = `ROUND ${speedIndex + 1} / ${currentSpeedQuestions.length}`;
+            document.getElementById('speedScoreText').innerText = speedScore;
+            document.getElementById('speedQuestionText').innerText = `"${q.text}"`;
+            document.getElementById('speedFeedbackBanner').classList.add('hidden');
+
+            // Reset Timer
+            stopSpeedTimer();
+            speedTimeLeft = 8; // 8 seconds per round
+            updateSpeedTimerUI();
+
+            speedTimer = setInterval(() => {
+                speedTimeLeft -= 0.1;
+                if (speedTimeLeft <= 0) {
+                    speedTimeLeft = 0;
+                    updateSpeedTimerUI();
+                    stopSpeedTimer();
+                    handleSpeedTimeOut();
+                } else {
+                    updateSpeedTimerUI();
+                }
+            }, 100);
+        }
+
+        function updateSpeedTimerUI() {
+            document.getElementById('speedTimerText').innerText = Math.ceil(speedTimeLeft);
+            const pct = (speedTimeLeft / 8) * 100;
+            document.getElementById('speedTimerBar').style.width = `${pct}%`;
+        }
+
+        function stopSpeedTimer() {
+            if (speedTimer) {
+                clearInterval(speedTimer);
+                speedTimer = null;
+            }
+        }
+
+        function submitSpeedAnswer(userChoice) {
+            stopSpeedTimer();
+            const q = currentSpeedQuestions[speedIndex];
+            const isCorrect = (userChoice === q.ans);
+            const banner = document.getElementById('speedFeedbackBanner');
+
+            if (isCorrect) {
+                playSound('correct');
+                speedScore += 10;
+                document.getElementById('speedScoreText').innerText = speedScore;
+                banner.className = "py-2 text-sm font-bold rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 animate-fade-in";
+                banner.innerText = "⭕ 정답입니다! (+10점)";
+            } else {
+                playSound('wrong');
+                banner.className = "py-2 text-sm font-bold rounded-xl bg-rose-500/20 text-rose-300 border border-rose-500/40 animate-fade-in";
+                banner.innerText = "❌ 아쉽게도 오답입니다!";
+            }
+
+            banner.classList.remove('hidden');
+
+            setTimeout(() => {
+                speedIndex++;
+                renderSpeedQuestion();
+            }, 900);
+        }
+
+        function handleSpeedTimeOut() {
+            playSound('wrong');
+            const banner = document.getElementById('speedFeedbackBanner');
+            banner.className = "py-2 text-sm font-bold rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/40 animate-fade-in";
+            banner.innerText = "⏰ 시간 초과!";
+            banner.classList.remove('hidden');
+
+            setTimeout(() => {
+                speedIndex++;
+                renderSpeedQuestion();
+            }, 900);
+        }
+    </script>
+</body>
+</html>
